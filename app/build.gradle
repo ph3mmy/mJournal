@@ -24,16 +24,25 @@ android {
 
 dependencies {
     def androidSupportVer = "27.1.1"
-    def playVersion = "12.0.1"
-    def firebaseVer = "12.0.1"
+    def playVersion = "15.0.1"
+    def firebaseVer = "16.0.1"
+    def roomVersion = "1.1.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation "com.google.firebase:firebase-auth:$firebaseVer"
+    implementation "com.google.firebase:firebase-database:$firebaseVer"
     implementation "com.google.android.gms:play-services-auth:$playVersion"
     implementation "com.android.support:appcompat-v7:$androidSupportVer"
     implementation "com.android.support:design:$androidSupportVer"
     implementation "com.android.support:cardview-v7:$androidSupportVer"
+
+
+    //Android Room db/architecture component
+    implementation "android.arch.lifecycle:extensions:$roomVersion"
+    implementation "android.arch.persistence.room:runtime:$roomVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$roomVersion"
+    annotationProcessor "android.arch.persistence.room:compiler:$roomVersion"
 
     testImplementation 'junit:junit:4.12'
 

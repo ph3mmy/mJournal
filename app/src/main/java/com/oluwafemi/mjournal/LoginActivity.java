@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -21,8 +22,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.oluwafemi.mjournal.activity.DashboardActivity;
 import com.oluwafemi.mjournal.databinding.ActivityLoginBinding;
+import com.oluwafemi.mjournal.helper.Constants;
+import com.oluwafemi.mjournal.model.User;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -31,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 300;
     FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
+    DatabaseReference reference;
+    FirebaseDatabase firebaseDatabase;
 
     ActivityLoginBinding binding;
 
@@ -40,7 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-         startActivity(new Intent(this, DashboardActivity.class));
+//         startActivity(new Intent(this, DashboardActivity.class));
+            gotoDashboard();
         }
     }
 
@@ -60,6 +72,10 @@ public class LoginActivity extends AppCompatActivity {
 
         //Then we will get the GoogleSignInClient object from GoogleSignIn class
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // init firebase database
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        reference = firebaseDatabase.getReference(Constants.DB_USERS);
 
         binding.signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,9 +122,9 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
 //                            updateUI(user);
-                            Log.e(TAG, "onComplete: gotten users = " + user.getDisplayName() );
-                            finish();
-                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                            checkIfUserExists(user);
+                            Log.e(TAG, "onComplete: gotten users = " + user.getUid() );
+//                            gotoDashboard();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.e(TAG, "signInWithCredential:failure", task.getException());
@@ -117,5 +133,50 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void gotoDashboard() {
+        finish();
+        startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+    }
+
+    void checkIfUserExists(final FirebaseUser user) {
+
+        final String userUUID = user.getUid();
+
+        Query userRefQuery = reference.orderByChild("userId").equalTo(userUUID);
+
+        userRefQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(userUUID)) {
+                    Toast.makeText(LoginActivity.this, "User already added", Toast.LENGTH_SHORT).show();
+                } else {
+                    // add new user
+                    Log.e(TAG, "onDataChange: USER not present" );
+                    User sUser = new User();
+                    sUser.setUserId(userUUID);
+                    sUser.setUserEmail(user.getEmail());
+                    sUser.setUserName(user.getDisplayName());
+
+                    addUserToFirebase(userUUID, sUser);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    void addUserToFirebase(String uuid, User user) {
+        reference.child(uuid).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                gotoDashboard();
+            }
+        });
     }
 }
