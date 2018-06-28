@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.oluwafemi.mjournal.activity.DashboardActivity;
 import com.oluwafemi.mjournal.databinding.ActivityLoginBinding;
 import com.oluwafemi.mjournal.helper.Constants;
+import com.oluwafemi.mjournal.helper.PrefUtils;
 import com.oluwafemi.mjournal.model.User;
 
 public class LoginActivity extends AppCompatActivity {
@@ -111,23 +112,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.e(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-//                            updateUI(user);
                             checkIfUserExists(user);
-                            Log.e(TAG, "onComplete: gotten users = " + user.getUid() );
-//                            gotoDashboard();
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.e(TAG, "signInWithCredential:failure", task.getException());
                             Snackbar.make(binding.getRoot(), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
 
                         }
@@ -150,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userUUID)) {
-                    Toast.makeText(LoginActivity.this, "User already added", Toast.LENGTH_SHORT).show();
+                    gotoDashboard();
                 } else {
                     // add new user
                     Log.e(TAG, "onDataChange: USER not present" );
@@ -171,10 +164,11 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    void addUserToFirebase(String uuid, User user) {
+    void addUserToFirebase(final String uuid, User user) {
         reference.child(uuid).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                PrefUtils.setLoggedUserId(LoginActivity.this, uuid);
                 gotoDashboard();
             }
         });
