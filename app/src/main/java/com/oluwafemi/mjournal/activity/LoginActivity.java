@@ -1,4 +1,4 @@
-package com.oluwafemi.mjournal;
+package com.oluwafemi.mjournal.activity;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -28,7 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.oluwafemi.mjournal.activity.DashboardActivity;
+import com.oluwafemi.mjournal.R;
 import com.oluwafemi.mjournal.databinding.ActivityLoginBinding;
 import com.oluwafemi.mjournal.helper.Constants;
 import com.oluwafemi.mjournal.helper.PrefUtils;
@@ -143,10 +142,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userUUID)) {
+                    PrefUtils.setLoggedUserId(LoginActivity.this, userUUID);
                     gotoDashboard();
                 } else {
                     // add new user
-                    Log.e(TAG, "onDataChange: USER not present" );
                     User sUser = new User();
                     sUser.setUserId(userUUID);
                     sUser.setUserEmail(user.getEmail());

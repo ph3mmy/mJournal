@@ -3,4 +3,18 @@
     <string name="log_in_with_your_google_account">Log in with your Google Account</string>
     <string name="login_logo">login logo</string>
     <string name="string_dot">•</string>
+    <string name="write_here">Write here</string>
+    <string name="location">Location</string>
+    <string name="title_optional">Title (Optional)</string>
+    <string name="location_icon">Location Icon</string>
+    <string name="journal_photo">Journal Photo</string>
+    <string name="add_journal">Add Journal</string>
+    <string name="add_new_journal">Add New Journal</string>
+    <string name="ok">Ok</string>
+    <string name="title_location_permission">Location Permission Request</string>
+    <string name="text_location_permission">mJournal requires access to location to define location for your journal at this time</string>
+    <string name="journal_saved">Journal Saved successfully</string>
+    <string name="no_address_found">No address found</string>
+    <string name="change_location">Change Location</string>
+    <string name="cancel">Cancel</string>
 </resources>

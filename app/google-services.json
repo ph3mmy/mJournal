@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "14465269707-ht69jhthep6he90lhdvv45l05cs9vagc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oluwafemi.mjournal",
+            "certificate_hash": "dee3e09d50a96de4371bae823a3169122d3c35ba"
+          }
+        },
+        {
           "client_id": "14465269707-fvc2e7feffil1acjbjc633e57n950ag4.apps.googleusercontent.com",
           "client_type": 3
         }
